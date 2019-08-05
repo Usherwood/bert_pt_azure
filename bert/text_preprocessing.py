@@ -24,6 +24,19 @@ def clean_text_for_language_model(text, remove_users=True, remove_urls=True, rem
     re_word_repetition = re.compile(r'(\b\w+\W+)(\1{3,})') #repetition of multiple words
 
     s = text
+    if remove_users:
+        s = extract_mentioned_users(s,
+                                    remove_users=False,
+                                    replace_with_token=True,
+                                    token_to_replace='_user_')[0]
+    if remove_urls:
+        s = extract_urls(s,
+                         remove_urls=False,
+                         replace_with_token=True,
+                         token_to_replace='_url_')[0]
+    if remove_numbers:
+        s = replace_numbers(s)
+    
     s = re_repetition.sub(replace_repeated_character, s)
     s = re_word_repetition.sub(replace_repeated_word, s)
     s = lower_and_add_toks_for_case(s)
@@ -31,18 +44,7 @@ def clean_text_for_language_model(text, remove_users=True, remove_urls=True, rem
     s = remove_multiple_whitespace_from_string(s)
     s = add_start_of_doc_tokens(s)
     s = replace_repeated_punc(s)
-    if remove_numbers:
-        s = replace_numbers(s)
-    if remove_users:
-        s = extract_mentioned_users(s,
-                                    remove_users=False,
-                                    replace_with_token=True,
-                                    token_to_replace='[USER]')[0]
-    if remove_urls:
-        s = extract_urls(s,
-                         remove_urls=False,
-                         replace_with_token=True,
-                         token_to_replace='[URL]')[0]
+
     return s
 
 
